@@ -6,8 +6,7 @@ import {
 } from "streamlit-component-lib"
 import mermaid from 'mermaid';
 
-
-function MermaidViwer({args}: ComponentProps): ReactElement {
+function MermaidViewer({args}: ComponentProps): ReactElement {
   const ref = useRef<HTMLDivElement>(null);
   const { code, width, height } = args;
 
@@ -20,6 +19,8 @@ function MermaidViwer({args}: ComponentProps): ReactElement {
       mermaid.mermaidAPI.render('graphDiv', code).then((svgGraph) => {
         if (ref.current) {
           ref.current.innerHTML = svgGraph.svg;
+          // Enviamos el SVG de vuelta a Streamlit
+          Streamlit.setComponentValue(svgGraph.svg);
         }
       });
     }
@@ -28,4 +29,4 @@ function MermaidViwer({args}: ComponentProps): ReactElement {
   return <div ref={ref} style={{width: width, height: height, overflow: "auto"}} ></div>;
 }
 
-export default withStreamlitConnection(MermaidViwer)
+export default withStreamlitConnection(MermaidViewer)

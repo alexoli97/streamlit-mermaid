@@ -1,5 +1,4 @@
 import os
-
 import streamlit as st
 import streamlit.components.v1 as components
 
@@ -17,15 +16,14 @@ else:
     build_dir = os.path.join(parent_dir, "frontend/build")
     _streamlit_mermaid = components.declare_component("streamlit_mermaid", path=build_dir)
 
-
 def st_mermaid(code: str, width="auto", height="250px", key=None):
-    return _streamlit_mermaid(code=code, width=width, height=height, key=key)
-
+    svg = _streamlit_mermaid(code=code, width=width, height=height, key=key, default=None)
+    return {"svg": svg}
 
 # Test code to play with the component while it's in development.
-# During development, we can run this just as we would any other Streamlit
-# app: `$ streamlit run st_mermaid/__init__.py`
 if not _RELEASE:
+    import streamlit as st
+
     code = """
     graph TD
         A --> B
@@ -34,4 +32,17 @@ if not _RELEASE:
         D --> E
     """
 
-    st_mermaid(code)
+    result = st_mermaid(code)
+    if result and result["svg"]:
+        st.write("Diagrama renderizado:")
+        st.write(result["svg"], unsafe_allow_html=True)
+        
+        # Añadir botón de descarga
+        st.download_button(
+            label="Descargar SVG",
+            data=result["svg"],
+            file_name="mermaid_diagram.svg",
+            mime="image/svg+xml"
+        )
+    else:
+        st.write("No se pudo generar el SVG")
